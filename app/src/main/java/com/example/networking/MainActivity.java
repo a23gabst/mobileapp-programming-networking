@@ -67,6 +67,10 @@ public class MainActivity extends AppCompatActivity implements JsonTask.JsonTask
         List<Mountain> listOfMountains = gson.fromJson(json, type);
         items.clear();
         items.addAll(listOfMountains);
+        for (int i=0;i< items.size();i++) {
+            Log.d("Injeradoro", items.get(i).toString());
+            recyclerViewItems.add(new RecyclerViewItem(items.get(i).toString()));
+        }
         adapter.notifyDataSetChanged();
     }
 
