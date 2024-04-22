@@ -8,27 +8,34 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class MainActivity extends AppCompatActivity implements JsonTask.JsonTaskListener {
 
-    private final String JSON_URL = "HTTPS_URL_TO_JSON_DATA_CHANGE_THIS_URL";
+    private Gson gson;
+    private final String JSON_URL = "https://mobprog.webug.se/json-api?login=brom";
     private final String JSON_FILE = "mountains.json";
 
     ArrayList<Mountain> items = new ArrayList<>();
     ArrayList<RecyclerViewItem> recyclerViewItems = new ArrayList<>();
-    RecyclerViewAdapter adapter;
+    private RecyclerViewAdapter adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        gson =new Gson();
 
         items.add(new Mountain("Matterhorn"));
         items.add(new Mountain("Mont Blanc"));
         items.add(new Mountain("Denali"));
-        items.add(new Mountain("K2"));
+        items.add(new Mountain("Kebnekaise"));
 
         for (int i=0;i< items.size();i++) {
             Log.d("Injera", items.get(i).toString());
@@ -46,13 +53,21 @@ public class MainActivity extends AppCompatActivity implements JsonTask.JsonTask
         view.setLayoutManager(new LinearLayoutManager(this));
         view.setAdapter(adapter);
 
-        new JsonFile(this, this).execute(JSON_FILE);
+        //new JsonFile(this, this).execute(JSON_FILE);
+        new JsonTask(this).execute(JSON_URL);
     }
 
 
     @Override
     public void onPostExecute(String json) {
-        Log.d("MainActivity", json);
+
+        Log.d("Injerawot", json);
+
+        Type type = new TypeToken<List<Mountain>>() {}.getType();
+        List<Mountain> listOfMountains = gson.fromJson(json, type);
+        items.clear();
+        items.addAll(listOfMountains);
+        adapter.notifyDataSetChanged();
     }
 
 }
